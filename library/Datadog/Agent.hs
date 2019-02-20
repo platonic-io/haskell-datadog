@@ -108,8 +108,17 @@ instance FromJSON Span where
          <*> v .:? "metrics" .!= Nothing
          <*> v .:? "type" .!= Nothing
 
--- The meaning of this is ambiguous: https://github.com/DataDog/datadog-agent/issues/3031
--- The Double is always in the range [0.0, 1.0]
+-- "rate" is a number between `[0.0, 1.0]` indicating the desired percentage of
+-- traces that the agent wishes to downsample for a given service (`0.0` meaning
+-- dropping everything, `1.0` meaning keeping everything).
+--
+-- Clients should act upon `rate` by setting a `_sampling_priority_v1` field in
+-- `metrics` of the root span, which is an enum `[-1, 0, 1, 2]` indicating:
+--
+--    -1) the agent should drop the trace
+--     0) the agent may drop the trace
+--     1) the agent should try to keep the trace
+--     2) the agent must keep the trace (subject to account limits).
 data TraceResponse = TraceResponse
   { trRateByService :: Map Text Double
   }
