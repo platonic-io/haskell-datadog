@@ -43,7 +43,7 @@ data Trace = Trace
   }
 
 newtype SpanName = SpanName (Refined (DDText && HasAlpha) Text)
-newtype MetaKey = MetaKey (Refined (DDText && Tag) Text)
+newtype MetaKey = MetaKey (Refined (DDText && Tag) Text) deriving (Eq, Ord)
 newtype MetaValue = MetaValue (Refined DDText Text)
 
 data Span = Span
