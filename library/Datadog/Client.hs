@@ -12,7 +12,7 @@
 module Datadog.Client where
 
 import           Control.Monad             (unless, void)
-import           Data.Char                 (isAlpha, isAlphaNum)
+import           Data.Char                 (isAlpha, isAsciiLower, isDigit)
 import           Data.Int                  (Int64)
 import qualified Data.List.NonEmpty        as NEL
 import           Data.Map.Strict           (Map)
@@ -34,7 +34,7 @@ type DDText = NonEmpty && (SizeLessThan 101)
 
 newtype SpanId = SpanId (Refined NonZero Word64)
 newtype TraceId = TraceId (Refined NonZero Word64)
-newtype ServiceName = ServiceName (Refined (DDText && AlphaNum) Text)
+newtype ServiceName = ServiceName (Refined (DDText && Tag) Text)
 
 data Trace = Trace
   { tService :: ServiceName
@@ -43,7 +43,7 @@ data Trace = Trace
   }
 
 newtype SpanName = SpanName (Refined (DDText && HasAlpha) Text)
-newtype MetaKey = MetaKey (Refined (DDText && AlphaNum) Text)
+newtype MetaKey = MetaKey (Refined (DDText && Tag) Text)
 newtype MetaValue = MetaValue (Refined DDText Text)
 
 data Span = Span
@@ -97,9 +97,17 @@ traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
       let (nanos, _) = properFraction (1000000000 * time)
       in  nanos
 
-data AlphaNum
-instance Predicate AlphaNum Text where
-   validate p txt = validate' p (T.all isAlphaNum) txt
+data Tag
+instance Predicate Tag Text where
+   validate p txt = validate' p (T.all isValidChar) txt
+                    where
+                      -- dumbed down `normalizeTag`
+                      isValidChar c = case c of
+                        ':' -> True
+                        '.' -> True
+                        '/' -> True
+                        '-' -> True
+                        c'  -> isAsciiLower c' || isDigit c'
 
 data HasAlpha
 instance Predicate HasAlpha Text where
