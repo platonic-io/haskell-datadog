@@ -32,19 +32,19 @@ import qualified Datadog.Agent             as API
 
 type DDText = NonEmpty && (SizeLessThan 101)
 
-newtype SpanId = SpanId (Refined NonZero Word64)
-newtype TraceId = TraceId (Refined NonZero Word64)
-newtype ServiceName = ServiceName (Refined (DDText && Tag) Text)
+newtype SpanId = SpanId (Refined NonZero Word64) deriving (Eq, Show)
+newtype TraceId = TraceId (Refined NonZero Word64) deriving (Eq, Show)
+newtype ServiceName = ServiceName (Refined (DDText && Tag) Text) deriving (Eq, Show)
 
 data Trace = Trace
   { tService :: ServiceName
   , tId      :: TraceId
   , tSpans   :: (Refined NonEmpty (Map SpanId Span))
-  }
+  } deriving (Eq, Show)
 
-newtype SpanName = SpanName (Refined (DDText && HasAlpha) Text)
-newtype MetaKey = MetaKey (Refined (DDText && Tag) Text) deriving (Eq, Ord)
-newtype MetaValue = MetaValue (Refined DDText Text)
+newtype SpanName = SpanName (Refined (DDText && HasAlpha) Text) deriving (Eq, Show)
+newtype MetaKey = MetaKey (Refined (DDText && Tag) Text) deriving (Eq, Ord, Show)
+newtype MetaValue = MetaValue (Refined DDText Text) deriving (Eq, Show)
 
 data Span = Span
   { sName     :: SpanName
@@ -52,7 +52,7 @@ data Span = Span
   , sStart    :: UTCTime
   , sDuration :: NominalDiffTime
   , sMeta     :: Maybe (Map MetaKey MetaValue)
-  }
+  } deriving (Eq, Show)
 
 traces :: NEL.NonEmpty Trace -> ClientM ()
 traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
