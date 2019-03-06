@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE TypeApplications      #-}
@@ -9,10 +10,28 @@
 --
 -- Many of our refinements are stricter than the actual requirements, to err on
 -- the side of caution, and because the actual requirements are very complex.
-module Datadog.Client where
+module Datadog.Client (
+    Agent(..)
+  , AgentT
+  , DDText
+  , HasAlpha
+  , MetaKey(..)
+  , MetaValue(..)
+  , ServiceName(..)
+  , Span(..)
+  , SpanId(..)
+  , SpanName(..)
+  , Tag
+  , Trace(..)
+  , TraceId(..)
+  , newServantAgent
+) where
 
 import           Control.Monad             (unless, void)
+import           Control.Monad.Except      (ExceptT, MonadError, MonadIO,
+                                            liftEither, liftIO)
 import           Data.Char                 (isAlpha, isAsciiLower, isDigit)
+import           Data.FFunctor             (FFunctor, ffmap)
 import           Data.Int                  (Int64)
 import qualified Data.List.NonEmpty        as NEL
 import           Data.Map.Strict           (Map)
@@ -25,12 +44,33 @@ import           Data.Time                 (NominalDiffTime, UTCTime)
 import           Data.Time.Clock.POSIX     (utcTimeToPOSIXSeconds)
 import           Data.Typeable             (Proxy (..), Typeable, typeOf)
 import           Data.Word                 (Word64)
-import           Refined
-import           Servant.Client            (ClientM, client)
+import           Refined                   hiding (NonEmpty)
+import qualified Refined
+import           Servant.Client            (ClientEnv, ClientM, ServantError,
+                                            client, runClientM)
 
 import qualified Datadog.Agent             as API
 
-type DDText = NonEmpty && (SizeLessThan 101)
+-- | The Datadog Agent API, independent of any HTTP framework.
+newtype Agent m = Agent
+  { putTraces :: NEL.NonEmpty Trace -> m ()
+  }
+
+-- | Allows users to opt-out of having a MonadError in their Monad stack. They
+--   opt-in to error handling at the points when calling the Agent. Requires
+--   users to handle errors at the point of use.
+--
+--   See https://discourse.haskell.org/t/local-capabilities-with-mtl/231
+type AgentT m = Agent (ExceptT ServantError m)
+
+instance FFunctor Agent where
+  ffmap nt (Agent p1) = Agent (nt . p1)
+
+-- | An Agent (or AgentT) implemented by Servant.
+newServantAgent :: (MonadIO m, MonadError ServantError m) => ClientEnv -> Agent m
+newServantAgent env = ffmap (liftClientM env) (Agent traces)
+
+type DDText = Refined.NonEmpty && (SizeLessThan 101)
 
 newtype SpanId = SpanId (Refined NonZero Word64) deriving (Eq, Show)
 newtype TraceId = TraceId (Refined NonZero Word64) deriving (Eq, Show)
@@ -39,7 +79,7 @@ newtype ServiceName = ServiceName (Refined (DDText && Tag) Text) deriving (Eq, S
 data Trace = Trace
   { tService :: ServiceName
   , tId      :: TraceId
-  , tSpans   :: (Refined NonEmpty (Map SpanId Span))
+  , tSpans   :: (Refined (Refined.NonEmpty) (Map SpanId Span))
   } deriving (Eq, Show)
 
 newtype SpanName = SpanName (Refined (DDText && HasAlpha) Text) deriving (Eq, Show)
@@ -117,3 +157,10 @@ validate' :: (Typeable t, Monad m, Show a) => t -> (a -> Bool) -> a -> RefineT m
 validate' t p a =
   unless (p a) $
   throwRefineOtherException (typeOf t) ("failed predicate: " <> (viaShow a))
+
+-- | Converts ClientM signatures into MTL, pushing errors into the stack.
+liftClientM :: (MonadIO m, MonadError ServantError m)
+  => ClientEnv
+  -> ClientM a
+  -> m a
+liftClientM env ca = liftEither =<< (liftIO $ runClientM ca env)

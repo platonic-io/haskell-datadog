@@ -29,6 +29,7 @@ common deps
   build-depends:    , base ^>= 4.11.1.0 || ^>= 4.12.0.0
                     , bytestring           ^>= 0.10.8.2
                     , containers ^>= 0.5.11.0 || ^>= 0.6.0.1
+                    , mtl                  ^>= 2.2.2
                     , text                 ^>= 1.2.3.1
                     , aeson                ^>= 1.4.1.0
                     , servant              ^>= 0.14.1
@@ -42,7 +43,8 @@ library
   exposed-modules:    Datadog.Agent
                     , Datadog.Client
                     , Datadog.Jaeger
-  build-depends:    , generic-random  ^>= 1.2.0.0
+  build-depends:    , ffunctor        ^>= 1.1.0
+                    , generic-random  ^>= 1.2.0.0
                     , refined         ^>= 0.2.3.0
                     , prettyprinter   ^>= 1.2.1
                     , servant-client  ^>= 0.14
