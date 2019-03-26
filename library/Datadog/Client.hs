@@ -113,7 +113,9 @@ traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
              start
              duration
              meta)) =
-      API.Span serviceName
+      let metrics = (\_ -> API.Metrics 2) <$> parent -- never sample
+      in API.Span
+               serviceName
                spanName
                "time" -- not using resource, but it is required
                traceId
@@ -123,7 +125,7 @@ traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
                (nominalToNanos duration)
                Nothing -- not using error
                ((\m -> (M.map unValue) . (M.mapKeys unKey) $ m) <$> meta)
-               Nothing -- not using metrics
+               metrics
                Nothing -- not using type
 
     unKey (MetaKey (unrefine -> k)) = k
