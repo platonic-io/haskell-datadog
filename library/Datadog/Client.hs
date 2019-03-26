@@ -92,6 +92,7 @@ data Span = Span
   , sStart    :: UTCTime
   , sDuration :: NominalDiffTime
   , sMeta     :: Maybe (Map MetaKey MetaValue)
+  , sError    :: Bool
   } deriving (Eq, Show)
 
 traces :: NEL.NonEmpty Trace -> ClientM ()
@@ -112,7 +113,8 @@ traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
              parent
              start
              duration
-             meta)) =
+             meta
+             err)) =
       let metrics = (\_ -> API.Metrics 2) <$> parent -- never sample
       in API.Span
                serviceName
@@ -123,7 +125,7 @@ traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
                ((\(SpanId (unrefine -> p)) -> p) <$> parent)
                (timeToNanos start)
                (nominalToNanos duration)
-               Nothing -- not using error
+               (if err then Just 1 else Nothing)
                ((\m -> (M.map unValue) . (M.mapKeys unKey) $ m) <$> meta)
                metrics
                Nothing -- not using type
