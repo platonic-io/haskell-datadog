@@ -19,6 +19,7 @@ import           Data.Word           (Word64)
 import           Generic.Random      (genericArbitraryU)
 import           GHC.Generics        (Generic)
 import           Servant.API
+import           Servant.MsgPack
 import           Test.QuickCheck     (Arbitrary, arbitrary)
 
 -- defined in pkg/trace/api/api.go
@@ -46,11 +47,13 @@ import           Test.QuickCheck     (Arbitrary, arbitrary)
 -- and will silently rewrite invalid data, e.g. the normalisation routines, when
 -- ParentID == TraceID == SpanID the parent is reset to 0.
 type Traces4 = "v0.4" :> "traces"
-              :> ReqBody '[JSON] [Trace]
-              :> Put '[JSON] TraceResponse
+              :> ReqBody '[MsgPack, JSON] [Trace]
+              :> Put '[MsgPack, JSON] TraceResponse
 
 -- backcompat
-type Traces3 = "v0.3" :> "traces" :> ReqBody '[JSON] [Trace] :> Put '[JSON] ()
+type Traces3 = "v0.3" :> "traces"
+              :> ReqBody '[MsgPack, JSON] [Trace]
+              :> Put '[PlainText] NoContent
 
 newtype Trace = Trace [Span] deriving (ToJSON, FromJSON)
 
