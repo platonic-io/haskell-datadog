@@ -9,7 +9,6 @@
 -- exposed that allows downloading all the recorded data in a format compatible
 -- with Jaeger tracing.
 
-import           Control.Monad            (void)
 import           Control.Monad.IO.Class   (liftIO)
 import           Data.IORef
 import qualified Data.Map.Strict          as M
@@ -27,8 +26,8 @@ main = do
   let services = (postTraces3 ref) :<|> (postTraces4 ref) :<|> (getTraces ref)
   run 8126 (serve (Proxy @ Services) services)
 
-postTraces3 :: IORef [Trace] -> [Trace] -> Handler ()
-postTraces3 r t = void $ postTraces4 r t
+postTraces3 :: IORef [Trace] -> [Trace] -> Handler NoContent
+postTraces3 r t = (\_ -> NoContent) <$> postTraces4 r t
 
 postTraces4 :: IORef [Trace] -> [Trace] -> Handler TraceResponse
 postTraces4 ref traces = liftIO $ (atomicModifyIORef' ref update)

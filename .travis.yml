@@ -9,7 +9,8 @@ install:
     cabal new-update
 
 script:
-  - cabal v2-test --constraint "datadog-tracing +manual"
+  - cabal v2-build -O0 all --constraint "datadog-tracing +manual"
+  - cabal v2-test -O0
 before_cache:
   - rm -rf $HOME/.cabal/logs
 
