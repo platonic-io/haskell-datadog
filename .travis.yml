@@ -1,7 +1,7 @@
 language: haskell
 ghc:
   - 8.4.4
-  - 8.6.3
+  - 8.6.4
 cabal: 2.4
 
 install:
@@ -9,7 +9,7 @@ install:
     cabal new-update
 
 script:
-  - cabal v2-test
+  - cabal v2-test --constraint "datadog-tracing +manual"
 before_cache:
   - rm -rf $HOME/.cabal/logs
 
