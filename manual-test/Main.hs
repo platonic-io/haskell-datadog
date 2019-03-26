@@ -45,9 +45,10 @@ main = do
   spanid <- randomWord64
   let http   = client (Proxy @ Traces3)
       env    = mkClientEnv mgr base
+      metrics = Just $ Metrics 2
       traces = [ (Trace
                   [ Span "tester" "span" "time" traceid spanid Nothing start 800971
-                    Nothing Nothing Nothing Nothing
+                    Nothing Nothing metrics Nothing
                   ])
                ]
   putStrLn (LT.unpack . encodeToLazyText $ traces)

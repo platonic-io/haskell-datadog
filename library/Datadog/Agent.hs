@@ -49,6 +49,8 @@ import           Test.QuickCheck     (Arbitrary, arbitrary)
 type Traces4 = "v0.4" :> "traces"
               :> ReqBody '[MsgPack, JSON] [Trace]
               :> Put '[MsgPack, JSON] TraceResponse
+              -- WARNING: agent incorrectly sets the response type to be plain text
+              -- https://github.com/DataDog/datadog-agent/issues/3207#issuecomment-476716966
 
 -- backcompat
 type Traces3 = "v0.3" :> "traces"
@@ -69,7 +71,7 @@ data Span = Span
   , spanDuration :: Int64
   , spanError    :: Maybe Int32
   , spanMeta     :: Maybe (Map Text Text)
-  , spanMetrics  :: Maybe (Map Text Text)
+  , spanMetrics  :: Maybe Metrics
   , spanType     :: Maybe Text
   } deriving (Generic)
 
@@ -110,6 +112,20 @@ instance FromJSON Span where
          <*> v .:? "meta" .!= Nothing
          <*> v .:? "metrics" .!= Nothing
          <*> v .:? "type" .!= Nothing
+
+-- See TraceResponse
+data Metrics = Metrics Int deriving (Generic)
+
+instance Arbitrary Metrics where
+  arbitrary = genericArbitraryU
+
+instance ToJSON Metrics where
+  toJSON (Metrics priority) = object
+    [ "_sampling_priority_v1" .= priority ]
+
+instance FromJSON Metrics where
+  parseJSON = withObject "Metrics" $ \v ->
+    Metrics <$> v .: "_sampling_priority_v1"
 
 -- "rate" is a number between `[0.0, 1.0]` indicating the desired percentage of
 -- traces that the agent wishes to downsample for a given service (`0.0` meaning
