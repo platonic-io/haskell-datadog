@@ -11,7 +11,6 @@ module Servant.MsgPack where
 
 import           Data.Aeson
 import           Data.List.NonEmpty
-import           Data.MessagePack         (pack, unpack)
 import           Data.MessagePack.Aeson
 import           Network.HTTP.Media       ((//))
 import           Servant.API.ContentTypes
@@ -24,9 +23,9 @@ instance Accept MsgPack where
                             , "application" // "vnd.msgpack"]
 
 instance ToJSON a => MimeRender MsgPack a where
-  mimeRender _ = pack . fromAeson . toJSON
+  mimeRender _ = packToJSON
 
 instance FromJSON a => MimeUnrender MsgPack a where
-  mimeUnrender _ b = case fromJSON =<< toAeson =<< unpack b of
-    Error str -> Left str
-    Success a -> Right a
+  mimeUnrender _ b = case unpackFromJSON b of
+      Error str -> Left str
+      Success a -> Right a
