@@ -2,11 +2,7 @@
 --   http://hackage.haskell.org/package/msgpack-aeson-0.1.0.0/docs/src/Data-MessagePack-Aeson.html#toAeson
 --   with only minor changes to use the data-msgpack fork (mostly changing Vector to list).
 
-{-# LANGUAGE DeriveDataTypeable         #-}
-{-# LANGUAGE DeriveFunctor              #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase                 #-}
-{-# LANGUAGE ViewPatterns               #-}
+{-# LANGUAGE LambdaCase #-}
 
 -- | Aeson bridge for MessagePack
 --
@@ -14,14 +10,15 @@
 module Data.MessagePack.Aeson where
 
 import           Control.Arrow
-import           Data.Aeson          as A
-import qualified Data.HashMap.Strict as HM
-import           Data.MessagePack    as MP
+import           Data.Aeson           as A
+import           Data.ByteString.Lazy (ByteString)
+import qualified Data.HashMap.Strict  as HM
+import           Data.MessagePack     as MP
 import           Data.Scientific
-import qualified Data.Text.Encoding  as T
-import qualified Data.Vector         as V
+import qualified Data.Text.Encoding   as T
+import qualified Data.Vector          as V
 
-toAeson :: (Monad m) => MP.Object -> m Value
+toAeson :: MP.Object -> A.Result Value
 toAeson = \case
   ObjectNil      -> pure Null
   ObjectBool b   -> pure . Bool $ b
@@ -30,11 +27,12 @@ toAeson = \case
   ObjectDouble d -> pure . Number $ realToFrac d
   ObjectStr t    -> pure . String $ t
   ObjectBin b    -> String <$> either (fail . show) pure (T.decodeUtf8' b)
-  ObjectArray (V.fromList -> v)  -> Array <$> V.mapM toAeson v
-  ObjectMap (m)    ->
-    A.Object . HM.fromList <$> mapM (\(k, v) -> (,) <$> fromObject k <*> toAeson v) m
-  ObjectExt _ _  -> fail "ObjectExt not supported"
-  ObjectWord _ -> fail "ObjectWord not supported"
+  ObjectArray v  -> Array <$> V.mapM toAeson v
+  ObjectMap m    ->
+    A.Object . HM.fromList . V.toList
+      <$> V.mapM (\(k, v) -> (,) <$> from k <*> toAeson v) m
+      where from = maybe (fail "bad object") pure . MP.fromObject
+  ObjectExt _ _  -> fail "ObjectExt is not supported"
 
 fromAeson :: Value -> MP.Object
 fromAeson = \case
@@ -45,5 +43,11 @@ fromAeson = \case
       Left f  -> ObjectDouble f
       Right n -> ObjectInt n
   String t    -> ObjectStr t
-  Array (V.toList -> v)     -> ObjectArray $ map fromAeson v
-  A.Object (HM.toList -> o)  -> ObjectMap $ map (toObject *** fromAeson) o
+  Array v     -> ObjectArray $ V.map fromAeson v
+  A.Object o  -> ObjectMap $ V.fromList $ map (toObject *** fromAeson) $ HM.toList o
+
+packToJSON :: ToJSON a => a -> ByteString
+packToJSON = pack . fromAeson . toJSON
+
+unpackFromJSON :: FromJSON a => ByteString -> Result a
+unpackFromJSON b = fromJSON =<< toAeson =<< maybe (fail "msgpack") pure (unpack b)
