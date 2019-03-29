@@ -30,7 +30,9 @@ postTraces3 :: IORef [Trace] -> [Trace] -> Handler NoContent
 postTraces3 r t = (\_ -> NoContent) <$> postTraces4 r t
 
 postTraces4 :: IORef [Trace] -> [Trace] -> Handler TraceResponse
-postTraces4 ref traces = liftIO $ (atomicModifyIORef' ref update)
+postTraces4 ref traces = do
+  liftIO . putStrLn $ "received " <> show (length traces) <> " traces"
+  liftIO $ (atomicModifyIORef' ref update)
   where update store = ((reverse traces) <> store, TraceResponse M.empty)
 
 getTraces :: IORef [Trace] -> Handler Jaeger
