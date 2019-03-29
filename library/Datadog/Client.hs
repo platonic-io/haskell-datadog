@@ -25,11 +25,12 @@ module Datadog.Client (
   , Trace(..)
   , TraceId(..)
   , newServantAgent
+  , newServantAgent'
 ) where
 
 import           Control.Monad             (unless, void)
 import           Control.Monad.Except      (ExceptT, MonadError, MonadIO,
-                                            liftEither, liftIO)
+                                            liftEither, liftIO, runExceptT)
 import           Data.Char                 (isAlpha, isAsciiLower, isDigit)
 import           Data.FFunctor             (FFunctor, ffmap)
 import           Data.Int                  (Int64)
@@ -69,6 +70,12 @@ instance FFunctor Agent where
 -- | An Agent (or AgentT) implemented by Servant.
 newServantAgent :: (MonadIO m, MonadError ServantError m) => ClientEnv -> Agent m
 newServantAgent env = ffmap (liftClientM env) (Agent traces)
+
+-- | A fire-and-forget Agent implemented by Servant.
+newServantAgent' :: MonadIO m => ClientEnv -> Agent m
+newServantAgent' env =
+  let agent = newServantAgent env
+  in Agent (\t -> void . runExceptT $ putTraces agent t)
 
 type DDText = Refined.NonEmpty && (SizeLessThan 101)
 
