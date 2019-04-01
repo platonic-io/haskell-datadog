@@ -47,7 +47,7 @@ main = do
       env    = mkClientEnv mgr base
       metrics = Just $ Metrics 2
       traces = [ (Trace
-                  [ Span "tester" "span" "time" traceid spanid Nothing start 800971
+                  [ Span "tester" "span" "time" traceid spanid 0 start 800971
                     Nothing Nothing metrics Nothing
                   ])
                ]
