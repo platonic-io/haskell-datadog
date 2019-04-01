@@ -122,14 +122,16 @@ traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
              duration
              meta
              err)) =
-      let metrics = (\_ -> API.Metrics 2) <$> parent -- never sample
+      let metrics = case parent of
+            Nothing -> Just $ API.Metrics 2 -- never sample (only on the root)
+            Just _  -> Nothing
       in API.Span
                serviceName
                spanName
                "time" -- not using resource, but it is required
                traceId
                spanId
-               ((\(SpanId (unrefine -> p)) -> p) <$> parent)
+               (maybe 0 (\(SpanId (unrefine -> p)) -> p) parent)
                (timeToNanos start)
                (nominalToNanos duration)
                (if err then Just 1 else Nothing)
