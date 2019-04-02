@@ -43,8 +43,7 @@
             },
             "type": "кՆ",
             "duration": -3270280,
-            "span_id": 3745917,
-            "parent_id": 10566599
+            "span_id": 3745917
         },
         {
             "metrics": {
@@ -73,7 +72,7 @@
             },
             "duration": -12712376,
             "span_id": 3214044,
-            "parent_id": 11310537
+            "parent_id": 3512439
         },
         {
             "service": "ϢÔJ3J\u0005햑[mݭҗཚدթീ㖚ֶś<ꀬ8ָ̮",
@@ -92,7 +91,7 @@
             "type": "\u0016",
             "duration": -5486785,
             "span_id": 9304842,
-            "parent_id": 14188686
+            "parent_id": 16247598
         },
         {
             "metrics": {
@@ -121,7 +120,7 @@
             "type": "a؛䍯½߬C1߱zy\u0007",
             "duration": -13370585,
             "span_id": 16606573,
-            "parent_id": 10969960
+            "parent_id": 396450
         },
         {
             "metrics": {
@@ -159,7 +158,7 @@
             "type": "䱲ڄ؁ʆߴ[",
             "duration": 10799591,
             "span_id": 7443067,
-            "parent_id": 7153507
+            "parent_id": 15749411
         }
     ]
 }

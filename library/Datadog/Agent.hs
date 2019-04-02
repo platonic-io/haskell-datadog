@@ -66,7 +66,7 @@ data Span = Span
   , spanResource :: Text
   , spanTraceId  :: Word64
   , spanId       :: Word64
-  , spanParentId :: Word64 -- required, despite what the docs say. 0 for the root span.
+  , spanParentId :: Maybe Word64
   , spanStart    :: Int64
   , spanDuration :: Int64
   , spanError    :: Maybe Int32
@@ -85,11 +85,11 @@ instance ToJSON Span where
     , "resource"  .= spanResource
     , "trace_id"  .= spanTraceId
     , "span_id"   .= spanId
-    , "parent_id" .= spanParentId
     , "start"     .= spanStart
     , "duration"  .= spanDuration
     ]
-    [ "error"     .=? spanError
+    [ "parent_id" .=? spanParentId
+    , "error"     .=? spanError
     , "meta"      .=? spanMeta
     , "metrics"   .=? spanMetrics
     , "type"      .=? spanType
@@ -105,7 +105,7 @@ instance FromJSON Span where
          <*> v .: "resource"
          <*> v .: "trace_id"
          <*> v .: "span_id"
-         <*> v .: "parent_id"
+         <*> v .:? "parent_id" .!= Nothing
          <*> v .: "start"
          <*> v .: "duration"
          <*> v .:? "error" .!= Nothing

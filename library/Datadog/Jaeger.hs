@@ -16,7 +16,7 @@ import           Data.Aeson
 import           Data.List       (nub)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
-import           Data.Maybe      (mapMaybe)
+import           Data.Maybe      (mapMaybe, maybeToList)
 import           Data.Text       (Text)
 import qualified Data.Text       as T
 import           GHC.Generics    (Generic)
@@ -38,11 +38,10 @@ toJaeger traces = Jaeger $ mapMaybe traceToData traces
             (M.fromList $ (\a -> (ProcessID a, Process a)) <$> services spans)
     spanToSpan Agent.Span{..} =
       let traceId = (TraceID . showt $ spanTraceId)
-          parents = if spanParentId == 0 then [] else [spanParentId]
       in Span (SpanID . showt $ spanId)
               traceId
               (Name spanName)
-              ((Reference traceId) . (SpanID . showt) <$> parents)
+              ((Reference traceId) . (SpanID . showt) <$> maybeToList spanParentId)
               (toInteger spanStart)
               (toInteger spanDuration)
               (mkTag <$> (concat $ M.toList <$> spanMeta))
