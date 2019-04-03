@@ -2,7 +2,9 @@
 --   http://hackage.haskell.org/package/msgpack-aeson-0.1.0.0/docs/src/Data-MessagePack-Aeson.html#toAeson
 --   with only minor changes to use the data-msgpack fork (mostly changing Vector to list).
 
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE LambdaCase          #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications    #-}
 
 -- | Aeson bridge for MessagePack
 --
@@ -17,12 +19,15 @@ import           Data.MessagePack     as MP
 import           Data.Scientific
 import qualified Data.Text.Encoding   as T
 import qualified Data.Vector          as V
+import           Data.Word            (Word64)
 
 toAeson :: MP.Object -> A.Result Value
 toAeson = \case
   ObjectNil      -> pure Null
   ObjectBool b   -> pure . Bool $ b
-  ObjectInt n    -> pure . Number $ fromIntegral n
+  ObjectInt n    ->
+    let w64 :: Word64 = fromIntegral n -- WARNING: silent wraparound biased to unsigned integers, fixed in next msgpack
+    in  pure . Number . fromIntegral $ w64
   ObjectFloat f  -> pure . Number $ realToFrac f
   ObjectDouble d -> pure . Number $ realToFrac d
   ObjectStr t    -> pure . String $ t
@@ -39,9 +44,9 @@ fromAeson = \case
   Null        -> ObjectNil
   Bool b      -> ObjectBool b
   Number s ->
-    case floatingOrInteger s of
+    case floatingOrInteger @Double @Integer s of
       Left f  -> ObjectDouble f
-      Right n -> ObjectInt n
+      Right n -> ObjectInt (fromInteger n) -- WARNING: silent wraparound, fixed in next msgpack
   String t    -> ObjectStr t
   Array v     -> ObjectArray $ V.map fromAeson v
   A.Object o  -> ObjectMap $ V.fromList $ map (toObject *** fromAeson) $ HM.toList o
