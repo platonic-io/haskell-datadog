@@ -126,7 +126,7 @@ traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
       in API.Span
                serviceName
                spanName
-               "time" -- not using resource, but it is required
+               spanName -- not using resource
                traceId
                spanId
                ((\(SpanId (unrefine -> p)) -> p) <$> parent)
