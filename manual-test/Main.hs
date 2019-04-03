@@ -45,7 +45,7 @@ main = do
   spanid <- randomWord64
   let http   = client (Proxy @ Traces3)
       env    = mkClientEnv mgr base
-      metrics = Just $ Metrics 2
+      metrics = Just $ Metrics 2 1
       traces = [ (Trace
                   [ Span "tester" "span" "time" traceid spanid Nothing start 800971
                     Nothing Nothing metrics Nothing
