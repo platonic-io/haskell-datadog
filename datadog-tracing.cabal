@@ -1,6 +1,6 @@
 cabal-version:       2.2
 name:                datadog-tracing
-version:             1.3.2
+version:             1.3.3
 synopsis:            Datadog tracing client and mock agent.
 license:             BSD-3-Clause
 license-file:        LICENSE
@@ -69,7 +69,9 @@ executable datadog-agent
   hs-source-dirs:     exe
   main-is:            Main.hs
   build-depends:    , datadog-tracing
+                    , data-default         ^>= 0.7.1.1
                     , servant-server       ^>= 0.14.1
+                    , wai-extra            ^>= 3.0.25
                     , warp                 ^>= 3.2.25
   ghc-options:        -threaded
 

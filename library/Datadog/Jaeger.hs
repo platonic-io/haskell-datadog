@@ -38,10 +38,11 @@ toJaeger traces = Jaeger $ mapMaybe traceToData traces
             (M.fromList $ (\a -> (ProcessID a, Process a)) <$> services spans)
     spanToSpan Agent.Span{..} =
       let traceId = (TraceID . showt $ spanTraceId)
-      in Span (SpanID . showt $ spanId)
+          mkSpan s = SpanID $ (showt spanTraceId) <> "-" <> (showt s)
+      in Span (mkSpan spanId)
               traceId
               (Name spanName)
-              ((Reference traceId) . (SpanID . showt) <$> maybeToList spanParentId)
+              ((Reference traceId) . mkSpan <$> maybeToList spanParentId)
               (toInteger spanStart)
               (toInteger spanDuration)
               (mkTag <$> (concat $ M.toList <$> spanMeta))
