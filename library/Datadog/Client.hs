@@ -122,7 +122,7 @@ traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
              duration
              meta
              err)) =
-      let metrics = (\_ -> API.Metrics 2) <$> parent -- never sample
+      let metrics = (\_ -> API.Metrics 2 1) <$> parent -- never sample, always search
       in API.Span
                serviceName
                spanName

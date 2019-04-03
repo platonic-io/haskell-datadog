@@ -3,6 +3,7 @@
     "samples": [
         {
             "metrics": {
+                "_dd1.sr.eausr": 30,
                 "_sampling_priority_v1": 23
             },
             "service": "\u0016ہǂײӡťֻ",
@@ -47,6 +48,7 @@
         },
         {
             "metrics": {
+                "_dd1.sr.eausr": -13,
                 "_sampling_priority_v1": -30
             },
             "service": "\"ۇʦUï࿏홠Ы\"ۂo<ퟭ튪\u0003P:",
@@ -95,6 +97,7 @@
         },
         {
             "metrics": {
+                "_dd1.sr.eausr": 0,
                 "_sampling_priority_v1": -13
             },
             "service": "ޜ݌",
@@ -124,6 +127,7 @@
         },
         {
             "metrics": {
+                "_dd1.sr.eausr": 5,
                 "_sampling_priority_v1": -24
             },
             "service": "\u0015ވ{ථՔ'Xۯ\u0013",

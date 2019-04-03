@@ -114,18 +114,20 @@ instance FromJSON Span where
          <*> v .:? "type" .!= Nothing
 
 -- See TraceResponse
-data Metrics = Metrics Int deriving (Generic)
+data Metrics = Metrics Int Int deriving (Generic)
 
 instance Arbitrary Metrics where
   arbitrary = genericArbitraryU
 
 instance ToJSON Metrics where
-  toJSON (Metrics priority) = object
-    [ "_sampling_priority_v1" .= priority ]
+  toJSON (Metrics priority search) = object
+    [ "_sampling_priority_v1" .= priority
+    , "_dd1.sr.eausr" .= search]
 
 instance FromJSON Metrics where
   parseJSON = withObject "Metrics" $ \v ->
     Metrics <$> v .: "_sampling_priority_v1"
+            <*> v .: "_dd1.sr.eausr"
 
 -- "rate" is a number between `[0.0, 1.0]` indicating the desired percentage of
 -- traces that the agent wishes to downsample for a given service (`0.0` meaning
