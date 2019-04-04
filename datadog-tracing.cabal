@@ -71,7 +71,7 @@ executable datadog-agent
   build-depends:    , datadog-tracing
                     , data-default         ^>= 0.7.1.1
                     , servant-server       ^>= 0.14.1
-                    , wai-extra            ^>= 3.0.25
+                    , wai-extra            ^>= 3.0.24 || ^>= 3.0.25
                     , warp                 ^>= 3.2.25
   ghc-options:        -threaded
 
