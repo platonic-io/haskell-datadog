@@ -71,7 +71,7 @@ data Span = Span
   , spanDuration :: Int64
   , spanError    :: Maybe Int32
   , spanMeta     :: Maybe (Map Text Text)
-  , spanMetrics  :: Maybe Metrics
+  , spanMetrics  :: Maybe (Map Text Double)
   , spanType     :: Maybe Text
   } deriving (Generic)
 
@@ -112,22 +112,6 @@ instance FromJSON Span where
          <*> v .:? "meta" .!= Nothing
          <*> v .:? "metrics" .!= Nothing
          <*> v .:? "type" .!= Nothing
-
--- See TraceResponse
-data Metrics = Metrics Int Int deriving (Generic)
-
-instance Arbitrary Metrics where
-  arbitrary = genericArbitraryU
-
-instance ToJSON Metrics where
-  toJSON (Metrics priority search) = object
-    [ "_sampling_priority_v1" .= priority
-    , "_dd1.sr.eausr" .= search]
-
-instance FromJSON Metrics where
-  parseJSON = withObject "Metrics" $ \v ->
-    Metrics <$> v .: "_sampling_priority_v1"
-            <*> v .: "_dd1.sr.eausr"
 
 -- "rate" is a number between `[0.0, 1.0]` indicating the desired percentage of
 -- traces that the agent wishes to downsample for a given service (`0.0` meaning

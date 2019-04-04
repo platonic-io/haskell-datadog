@@ -122,7 +122,10 @@ traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
              duration
              meta
              err)) =
-      let metrics = (\_ -> API.Metrics 2 1) <$> parent -- never sample, always search
+      -- Magic undocumented flags: never sample, always search
+      let metrics = M.insert "_dd1.sr.eausr" 1 $ case parent of
+            Just _  -> M.singleton "_sampling_priority_v1" 2
+            Nothing -> M.empty
       in API.Span
                serviceName
                spanName
@@ -134,7 +137,7 @@ traces (NEL.toList -> ts) = void . raw $ toAPI <$> ts
                (nominalToNanos duration)
                (if err then Just 1 else Nothing)
                ((\m -> (M.map unValue) . (M.mapKeys unKey) $ m) <$> meta)
-               metrics
+               (Just metrics)
                Nothing -- not using type
 
     unKey (MetaKey (unrefine -> k)) = k
