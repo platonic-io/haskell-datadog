@@ -49,8 +49,7 @@ toJaeger traces = Jaeger $ mapMaybe traceToData traces
               (ProcessID spanService)
     services spans = nub $ Agent.spanService <$> spans
     showt = T.pack . show
-    mkTag (k, "true") = Tag k -- magic value skips concatenation
-    mkTag (k, v) = Tag $ T.concat [k, ":", v]
+    mkTag (k, v) = Tag k v
 
 newtype Jaeger = Jaeger [Data]
 instance ToJSON Jaeger where
@@ -87,7 +86,8 @@ data Reference = Reference
   , spanID  :: SpanID
   } deriving (Eq, Ord, Generic, ToJSON)
 
-newtype Tag = Tag
-  { key :: Text
+data Tag = Tag
+  { key   :: Text
+  , value :: Text
   } deriving (Eq, Generic)
     deriving anyclass (ToJSON)
