@@ -49,6 +49,7 @@ toJaeger traces = Jaeger $ mapMaybe traceToData traces
               (ProcessID spanService)
     services spans = nub $ Agent.spanService <$> spans
     showt = T.pack . show
+    mkTag (k, "true") = Tag k -- magic value skips concatenation
     mkTag (k, v) = Tag $ T.concat [k, ":", v]
 
 newtype Jaeger = Jaeger [Data]
