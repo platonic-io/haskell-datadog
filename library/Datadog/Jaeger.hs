@@ -14,12 +14,10 @@ module Datadog.Jaeger where
 
 import           Data.Aeson
 import           Data.List       (nub)
-import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
 import           Data.Maybe      (mapMaybe, maybeToList)
-import           Data.Text       (Text)
 import qualified Data.Text       as T
-import           GHC.Generics    (Generic)
+import           Jaeger.Data
 import           Servant.API
 
 import qualified Datadog.Agent   as Agent
@@ -49,45 +47,4 @@ toJaeger traces = Jaeger $ mapMaybe traceToData traces
               (ProcessID spanService)
     services spans = nub $ Agent.spanService <$> spans
     showt = T.pack . show
-    mkTag (k, v) = Tag k v
-
-newtype Jaeger = Jaeger [Data]
-instance ToJSON Jaeger where
-  toJSON (Jaeger dat) = object ["data" .= dat]
-
-newtype TraceID   = TraceID Text deriving newtype (Eq, Ord, ToJSON)
-newtype SpanID    = SpanID  Text deriving newtype (Eq, Ord, ToJSON)
-newtype ProcessID = ProcessID Text deriving newtype (Eq, Ord, ToJSON, ToJSONKey)
-newtype Name      = Name Text deriving newtype (Eq, ToJSON)
-
-data Data = Data
-  { traceID   :: TraceID
-  , spans     :: [Span]
-  , processes :: Map ProcessID Process
-  } deriving (Generic, ToJSON)
-
-data Process = Process
-  { serviceName :: Text
-  } deriving (Generic, ToJSON)
-
-data Span = Span
-  { spanID        :: SpanID
-  , traceID       :: TraceID
-  , operationName :: Name
-  , references    :: [Reference]
-  , startTime     :: Integer
-  , duration      :: Integer
-  , tags          :: [Tag]
-  , processID     :: ProcessID
-  } deriving (Generic, ToJSON)
-
-data Reference = Reference
-  { traceID :: TraceID
-  , spanID  :: SpanID
-  } deriving (Eq, Ord, Generic, ToJSON)
-
-data Tag = Tag
-  { key   :: Text
-  , value :: Text
-  } deriving (Eq, Generic)
-    deriving anyclass (ToJSON)
+    mkTag (k, v) = Tag k (String v)

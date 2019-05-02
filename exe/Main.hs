@@ -13,6 +13,7 @@ import           Control.Monad.IO.Class                    (liftIO)
 import           Data.Default                              (def)
 import           Data.IORef
 import qualified Data.Map.Strict                           as M
+import           Jaeger.Data
 import           Network.Wai.Handler.Warp                  (run)
 import           Network.Wai.Middleware.RequestLogger
 import           Network.Wai.Middleware.RequestLogger.JSON (formatAsJSON)
