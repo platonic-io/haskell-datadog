@@ -22,7 +22,7 @@ import           Servant
 import           Datadog.Agent
 import           Datadog.Jaeger
 
-type Services = (Traces3 :<|> Traces4 :<|> Dump)
+type Services = (Traces3 :<|> Traces4 :<|> Traces4' :<|> Dump)
 
 main :: IO ()
 main = do
@@ -31,7 +31,7 @@ main = do
       outputFormat = CustomOutputFormatWithDetails formatAsJSON
     }
 
-  let services = (postTraces3 ref) :<|> (postTraces4 ref) :<|> (getTraces ref)
+  let services = (postTraces3 ref) :<|> (postTraces4 ref) :<|> (postTraces4 ref) :<|> (getTraces ref)
   run 8126 (logger $ serve (Proxy @ Services) services)
 
 postTraces3 :: IORef [Trace] -> [Trace] -> Handler NoContent
