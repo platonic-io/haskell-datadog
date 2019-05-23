@@ -51,6 +51,10 @@ type Traces4 = "v0.4" :> "traces"
               :> Put '[MsgPack, JSON] TraceResponse
               -- WARNING: agent incorrectly sets the response type to be plain text
               -- https://github.com/DataDog/datadog-agent/issues/3207#issuecomment-476716966
+-- the go client uses POST instead of the documented PUT :slowclap:
+type Traces4' = "v0.4" :> "traces"
+              :> ReqBody '[MsgPack, JSON] [Trace]
+              :> Post '[MsgPack, JSON] TraceResponse
 
 -- backcompat
 type Traces3 = "v0.3" :> "traces"
