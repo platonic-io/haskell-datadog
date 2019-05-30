@@ -1,7 +1,7 @@
 language: haskell
 ghc:
   - 8.4.4
-  - 8.6.4
+  - 8.6.5
 cabal: 2.4
 
 install:
