@@ -1,0 +1,13 @@
+resolver: lts-13.22
+packages:
+  - .
+extra-deps:
+  - ffunctor-1.1.100
+  - jaeger-flamegraph-1.3.0
+  - msgpack-1.0.1.0
+  - refined-0.4.1
+  - servant-0.15
+  - servant-server-0.15
+  - servant-client-0.15
+  - servant-client-core-0.15
+  - tasty-1.1.0.4
