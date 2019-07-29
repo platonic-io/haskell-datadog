@@ -49,12 +49,12 @@ library
   exposed-modules:    Datadog.Agent
                     , Datadog.Client
                     , Datadog.Jaeger
-  other-modules:      Data.MessagePack.Aeson
-                    , Servant.MsgPack
+  other-modules:      Servant.MsgPack
   build-depends:    , ffunctor        ^>= 1.1.0
                     , generic-random  ^>= 1.2.0.0
                     , http-media      ^>= 0.7.1.3
-                    , msgpack         ^>= 1.0.1.0
+                    , msgpack         ^>= 1.1.0.0
+                    , msgpack-aeson   ^>= 0.2.0.0
                     , refined         ^>= 0.2.3.0 || ^>= 0.4
                     , prettyprinter   ^>= 1.2.1
                     , servant-client  ^>= 0.14 || ^>= 0.15
@@ -62,7 +62,7 @@ library
                     , time            ^>= 1.8.0.2
                     , unordered-containers ^>= 0.2.9.0
                     , vector          ^>= 0.12.0.2
-                    , QuickCheck      ^>= 2.11.3 || ^>= 2.12.6.1
+                    , QuickCheck      ^>= 2.11.3 || ^>= 2.12.6.1 || ^>= 2.13.2
                     , quickcheck-text ^>= 0.1.2.1
 
 executable datadog-agent

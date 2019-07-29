@@ -23,9 +23,9 @@ instance Accept MsgPack where
                             , "application" // "vnd.msgpack"]
 
 instance ToJSON a => MimeRender MsgPack a where
-  mimeRender _ = packToJSON
+  mimeRender _ = packAeson
 
 instance FromJSON a => MimeUnrender MsgPack a where
-  mimeUnrender _ b = case unpackFromJSON b of
+  mimeUnrender _ b = case unpackAeson b of
       Error str -> Left str
       Success a -> Right a
