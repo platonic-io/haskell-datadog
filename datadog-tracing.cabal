@@ -38,7 +38,7 @@ common deps
                     , mtl                  ^>= 2.2.2
                     , text                 ^>= 1.2.3.1
                     , aeson                ^>= 1.4.1.0
-                    , servant              ^>= 0.15
+                    , servant              ^>= 0.14 || ^>= 0.15
   ghc-options:        -Wall
                       -Werror=missing-home-modules
   default-language:   Haskell2010
@@ -57,7 +57,7 @@ library
                     , msgpack         ^>= 1.0.1.0
                     , refined         ^>= 0.2.3.0 || ^>= 0.4
                     , prettyprinter   ^>= 1.2.1
-                    , servant-client  ^>= 0.15
+                    , servant-client  ^>= 0.14 || ^>= 0.15
                     , scientific      ^>= 0.3.6.2
                     , time            ^>= 1.8.0.2
                     , unordered-containers ^>= 0.2.9.0
@@ -71,7 +71,7 @@ executable datadog-agent
   main-is:            Main.hs
   build-depends:    , datadog-tracing
                     , data-default         ^>= 0.7.1.1
-                    , servant-server       ^>= 0.15
+                    , servant-server       ^>= 0.14 || ^>= 0.15
                     , wai-extra            ^>= 3.0.24 || ^>= 3.0.25
                     , warp                 ^>= 3.2.25
   ghc-options:        -threaded
