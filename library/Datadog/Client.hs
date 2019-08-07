@@ -47,7 +47,7 @@ import           Data.Typeable             (Proxy (..), Typeable, typeOf)
 import           Data.Word                 (Word64)
 import           Refined                   hiding (NonEmpty)
 import qualified Refined
-import           Servant.Client            (ClientEnv, ClientM, ServantError,
+import           Servant.Client            (ClientEnv, ClientM, ClientError,
                                             client, runClientM)
 
 import qualified Datadog.Agent             as API
@@ -62,13 +62,13 @@ newtype Agent m = Agent
 --   users to handle errors at the point of use.
 --
 --   See https://discourse.haskell.org/t/local-capabilities-with-mtl/231
-type AgentT m = Agent (ExceptT ServantError m)
+type AgentT m = Agent (ExceptT ClientError m)
 
 instance FFunctor Agent where
   ffmap nt (Agent p1) = Agent (nt . p1)
 
 -- | An Agent (or AgentT) implemented by Servant.
-newServantAgent :: (MonadIO m, MonadError ServantError m) => ClientEnv -> Agent m
+newServantAgent :: (MonadIO m, MonadError ClientError m) => ClientEnv -> Agent m
 newServantAgent env = ffmap (liftClientM env) (Agent traces)
 
 -- | A fire-and-forget Agent implemented by Servant.
@@ -173,7 +173,7 @@ validate' t p a =
   throwRefineOtherException (typeOf t) ("failed predicate: " <> (viaShow a))
 
 -- | Converts ClientM signatures into MTL, pushing errors into the stack.
-liftClientM :: (MonadIO m, MonadError ServantError m)
+liftClientM :: (MonadIO m, MonadError ClientError m)
   => ClientEnv
   -> ClientM a
   -> m a
