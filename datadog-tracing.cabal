@@ -95,7 +95,7 @@ test-suite            tests
   other-modules:      Datadog.AgentTest
   build-depends:    , datadog-tracing
                     , hspec-golden-aeson ^>= 0.7
-                    , tasty              ^>= 1.1.0.4
+                    , tasty              ^>= 1.1.0.4 || ^>= 1.2
                     , tasty-hspec        ^>= 1.1.5.1
   build-tool-depends: tasty-discover:tasty-discover ^>= 4.2.1
   ghc-options:        -threaded
