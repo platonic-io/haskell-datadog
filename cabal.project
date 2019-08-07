@@ -9,11 +9,11 @@ package msgpack-aeson
 source-repository-package
     type: git
     location: https://github.com/symbiont-sam-halliday/msgpack-haskell.git
-    tag: 1b6c303c2a11a4eeaa24d1ec1b27ec136bf0686f
+    tag: bff614bc2dc22e5606c19c140a71fc0ebe7f4580
     subdir: msgpack
 
 source-repository-package
     type: git
     location: https://github.com/symbiont-sam-halliday/msgpack-haskell.git
-    tag: 1b6c303c2a11a4eeaa24d1ec1b27ec136bf0686f
+    tag: bff614bc2dc22e5606c19c140a71fc0ebe7f4580
     subdir: msgpack-aeson

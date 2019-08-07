@@ -53,7 +53,7 @@ library
   build-depends:    , ffunctor        ^>= 1.1.0 || ^>= 1.2.0
                     , generic-random  ^>= 1.2.0.0
                     , http-media      ^>= 0.7.1.3
-                    , msgpack         ^>= 1.0.1.0
+                    , msgpack         ^>= 1.1.0.0
                     , msgpack-aeson   ^>= 0.2.0.0
                     , refined         ^>= 0.2.3.0 || ^>= 0.4
                     , prettyprinter   ^>= 1.2.1
