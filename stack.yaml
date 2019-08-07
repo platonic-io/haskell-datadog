@@ -7,3 +7,9 @@ extra-deps:
   - lens-labels-0.3.0.1
   - QuickCheck-2.12.6.1
   - refined-0.4.2.2
+
+  - git: https://github.com/symbiont-sam-halliday/msgpack-haskell.git
+    commit: bff614bc2dc22e5606c19c140a71fc0ebe7f4580
+    subdirs:
+      - msgpack
+      - msgpack-aeson
