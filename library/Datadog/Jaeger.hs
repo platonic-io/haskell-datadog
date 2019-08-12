@@ -23,6 +23,7 @@ import           Servant.API
 import qualified Datadog.Agent   as Agent
 
 type Dump = "dump" :> Get '[JSON] Jaeger
+type Reset = "dump" :> DeleteNoContent '[JSON] NoContent
 
 toJaeger :: [Agent.Trace] -> Jaeger
 toJaeger traces = Jaeger $ mapMaybe traceToData traces
