@@ -46,12 +46,15 @@ common deps
 
 library
   import:          deps
-  hs-source-dirs:  library
+  hs-source-dirs:  library internal
+
+  -- cabal-fmt: expand library
   exposed-modules:
     Datadog.Agent
     Datadog.Client
     Datadog.Jaeger
 
+  -- cabal-fmt: expand internal
   other-modules:   Servant.MsgPack
   build-depends:
     , ffunctor              ^>=1.1.0 || ^>=1.2.0
