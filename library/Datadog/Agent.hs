@@ -146,3 +146,8 @@ instance ToJSON TraceResponse where
 instance FromJSON TraceResponse where
   parseJSON = withObject "TraceResponse" $ \v ->
     TraceResponse <$> v .: "rate_by_service"
+
+instance MessagePack TraceResponse where
+  toObject = unsafeViaToJSON
+  fromObject = viaFromJSON
+
