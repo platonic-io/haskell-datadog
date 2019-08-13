@@ -10,17 +10,19 @@
 module Datadog.Agent where
 
 import           Data.Aeson
-import           Data.Int            (Int32, Int64)
-import           Data.Map.Strict     (Map)
-import           Data.Maybe          (catMaybes)
-import           Data.Text           (Text)
-import           Data.Text.Arbitrary ()
-import           Data.Word           (Word64)
-import           Generic.Random      (genericArbitraryU)
-import           GHC.Generics        (Generic)
+import           Data.Int               (Int32, Int64)
+import           Data.Map.Strict        (Map)
+import           Data.Maybe             (catMaybes)
+import           Data.MessagePack       (MessagePack, fromObject, toObject)
+import           Data.MessagePack.Aeson
+import           Data.Text              (Text)
+import           Data.Text.Arbitrary    ()
+import           Data.Word              (Word64)
+import           Generic.Random         (genericArbitraryU)
+import           GHC.Generics           (Generic)
 import           Servant.API
 import           Servant.MsgPack
-import           Test.QuickCheck     (Arbitrary, arbitrary)
+import           Test.QuickCheck        (Arbitrary, arbitrary)
 
 -- defined in pkg/trace/api/api.go
 --
@@ -62,6 +64,10 @@ type Traces3 = "v0.3" :> "traces"
               :> Put '[PlainText] NoContent
 
 newtype Trace = Trace [Span] deriving (ToJSON, FromJSON)
+
+instance MessagePack Trace where
+  fromObject = viaFromJSON
+  toObject = unsafeViaToJSON
 
 -- | https://docs.datadoghq.com/api/?lang=python#tracing
 data Span = Span
