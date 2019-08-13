@@ -2,16 +2,10 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
 
--- | msgpack support for Servant, piggy backing off Aeson.
---
---   Note: if we wish to improve performance and/or control over the msgpack
---   formats, we should avoid the Aeson intermediate format and create direct
---   MessagePack a => Mime(R,Unr)ender instances.
 module Servant.MsgPack where
 
-import           Data.Aeson
 import           Data.List.NonEmpty
-import           Data.MessagePack.Aeson
+import           Data.MessagePack
 import           Network.HTTP.Media       ((//))
 import           Servant.API.ContentTypes
 
@@ -22,10 +16,8 @@ instance Accept MsgPack where
                             , "application" // "x-msgpack"
                             , "application" // "vnd.msgpack"]
 
-instance ToJSON a => MimeRender MsgPack a where
-  mimeRender _ = packAeson
+instance MessagePack a => MimeRender MsgPack a where
+  mimeRender _ = pack
 
-instance FromJSON a => MimeUnrender MsgPack a where
-  mimeUnrender _ b = case unpackAeson b of
-      Error str -> Left str
-      Success a -> Right a
+instance MessagePack a => MimeUnrender MsgPack a where
+  mimeUnrender _ = unpack
