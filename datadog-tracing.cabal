@@ -109,6 +109,8 @@ test-suite tests
   hs-source-dirs:     test
   type:               exitcode-stdio-1.0
   main-is:            Driver.hs
+
+  -- cabal-fmt: expand test -Driver
   other-modules:      Datadog.AgentTest
   build-depends:
     , datadog-tracing
